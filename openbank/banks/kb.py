@@ -76,10 +76,10 @@ class KB(Bank):
         """
 
         if start_date is None:
-            start_date = datetime.now()
+            start_date = datetime.today()
 
         if end_date is None:
-            end_date = datetime.now()
+            end_date = datetime.today()
 
         url = 'https://obank.kbstar.com/quics?asfilecode=524517'
         params = {
@@ -119,7 +119,7 @@ class KB(Bank):
             columns = [self.strip(column.split('<')[0]) for column in columns]
 
             transaction = Transaction()
-            transaction.date = datetime.strptime(columns[0], '%Y.%m.%d')
+            transaction.date = datetime.strptime(columns[0], '%Y.%m.%d').date()
             transaction.description = columns[1]
             transaction.withdrawal = self.parse_int(columns[4])
             transaction.deposit = self.parse_int(columns[5])
