@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
  
 from datetime import datetime
-import urllib2
+import requests
 from .. import Bank
 from .. import Transaction
+
+
+class KBError(Exception):
+    pass
 
 
 class KB(Bank):
@@ -14,7 +18,7 @@ class KB(Bank):
     #: 계좌 비밀번호 (숫자 4자리)
     password = None
 
-    #: 주민등록번호 끝 7자리
+    #: 주민등록번호 끝 7자리 혹은 사업자등록번호 끝 5자리
     resident = None
 
     #: 인터넷 뱅킹 ID (대문자)
@@ -50,8 +54,9 @@ class KB(Bank):
 
     @resident.setter
     def resident(self, value):
-        if len(value) != 7 or not value.isdigit():
-            raise ValueError(u"resident: 주민등록번호 끝 7자리를 입력해주세요.")
+        if not value.isdigit():
+            raise ValueError("resident: 주민등록번호 끝 7자리 혹은 사업자등록번호 끝 5자리"
+                             "를 입력해주세요.")
         self._resident = value
 
     @property
@@ -95,15 +100,19 @@ class KB(Bank):
             '조회구분': '2',
             'USER_TYPE': '02',
             '_FILE_NAME': 'KB_거래내역빠른조회.html',
-            '_LANG_TYPE': 'KOR'
+            '_LANG_TYPE': 'KOR',
         }
 
-        for k, v in params.iteritems():
-            url += '&' + k + '=' + v
-
-        r = urllib2.urlopen(url)
-        data = r.read()
-        return data
+        r = requests.post(url, params=params)
+        if r.status_code != requests.codes.ok:
+            html = r.content.decode('cp949')
+            try:
+                message_html = html.split('<dd>')[1].split('</dd>')[0]
+                message = message_html.replace('<br>', '').strip()
+            except:
+                raise KBError(html)
+            raise KBError(message)
+        return r.text
 
     def quick_inquiry(self, start_date=None, end_date=None):
         """국민은행 계좌 빠른조회. 빠른조회 서비스에 등록이 되어있어야 사용 가능.
