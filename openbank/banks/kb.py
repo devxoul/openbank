@@ -103,7 +103,7 @@ class KB(Bank):
             '_LANG_TYPE': 'KOR',
         }
 
-        r = requests.post(url, params=params)
+        r = requests.get(url, params=params, verify=True)
         if r.status_code != requests.codes.ok:
             html = r.content.decode('cp949')
             try:
