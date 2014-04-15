@@ -1,1 +1,1 @@
-from kb import KB
+from kb import KB, KBError

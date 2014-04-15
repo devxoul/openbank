@@ -45,7 +45,7 @@ class KB(Bank):
     @password.setter
     def password(self, value):
         if len(value) != 4 or not value.isdigit():
-            raise ValueError(u"password: 비밀번호는 숫자 4자리여야 합니다.")
+            raise ValueError("password: 비밀번호는 숫자 4자리여야 합니다.")
         self._password = value
 
     @property

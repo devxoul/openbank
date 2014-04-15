@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
 
-from openbank.banks import KB
+import sys
+import os
+
+# add python path (../)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from openbank.banks import KB, KBError
 from datetime import date
 from dateutil.relativedelta import relativedelta
 import operator
 
+
 kb = KB('ACCOUNT', 'PASSOWRD', 'RESIDENT', 'USERNAME')
 start_date = date.today() - relativedelta(months=1)  # for 1 month
-transactions = kb.quick_inquiry(start_date=start_date)
+
+try:
+    transactions = kb.quick_inquiry(start_date=start_date)
+except KBError as e:
+    print e
 
 
 def money_per_day():
@@ -37,3 +48,4 @@ def money_per_receiver():
 if __name__ == '__main__':
     # money_per_day()
     # money_per_receiver()
+    pass
